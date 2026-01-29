@@ -10,6 +10,8 @@ from typing import Annotated, Any, Dict, Optional
 
 from fastmcp import FastMCP
 from pydantic import Field
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from sql_mcp_server.sql_executor import execute_query
 
@@ -23,6 +25,12 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastMCP server
 mcp = FastMCP("SQL Query Server")
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> JSONResponse:
+    """Health check endpoint for load balancers and monitoring."""
+    return JSONResponse({"status": "healthy", "service": "sql-mcp-server"})
 
 
 @mcp.tool
